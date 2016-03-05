@@ -5,5 +5,15 @@ class Invitation {
     static constraints = {
     }
 
-    String code
+    static hasMany = [guests: Guest]
+
+    static mapping = {
+        id generator: 'knot.type.ShortRandomIdGenerator'
+    }
+
+    String id
+
+    InvitationStatus status = InvitationStatus.PENDING
+
+    List<Guest> guests
 }

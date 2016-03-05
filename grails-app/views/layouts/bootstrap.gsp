@@ -19,7 +19,11 @@
 
 <body role="document">
 
-<g:layoutBody/>
+<div class="container">
+
+    <g:layoutBody/>
+
+</div><!-- /.container -->
 
 </body>
 

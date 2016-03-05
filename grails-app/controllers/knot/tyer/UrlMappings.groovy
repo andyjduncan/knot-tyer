@@ -3,7 +3,11 @@ package knot.tyer
 class UrlMappings {
 
     static mappings = {
-        "/rsvp/$code"(controller: 'rsvp', action: 'rsvp')
+        group("/rsvp") {
+            "/$id/$action?"(controller: 'rsvp')
+            "/$id"(controller: 'rsvp', action: 'rsvp')
+        }
+
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
                 // apply constraints here
