@@ -2,6 +2,8 @@ package knot.tyer
 
 import knot.type.ChooseDietaryRequirementCommand
 
+import static knot.tyer.InvitationStatus.*
+
 class RsvpController {
 
     static defaultAction = "rsvp"
@@ -10,50 +12,68 @@ class RsvpController {
         def invitation = Invitation.get(id)
 
         switch (invitation.status) {
-            case InvitationStatus.PENDING:
-                render view: 'beginRsvp', model: [invitation: invitation]
+            case PENDING:
+                beginRsvp(invitation)
                 break
-            case InvitationStatus.DECLINED:
-                render view: 'commiserate', model: [invitation: invitation]
+            case DECLINED:
+                commiserate(invitation)
                 break
+            case ACCEPTED:
+                handleAccepted(invitation)
+                break
+
         }
 
     }
 
-    def decline(String id) {
-        def invitation = Invitation.get(id)
-
-        invitation.status = InvitationStatus.DECLINED
-
-        invitation.save()
-
-        redirect action: 'rsvp', params: [id: id]
+    private beginRsvp(invitation) {
+        render view: 'beginRsvp', model: [invitation: invitation]
     }
 
-    def accept(String id) {
-        def invitation = Invitation.get(id)
+    private commiserate(invitation) {
+        render view: 'commiserate', model: [invitation: invitation]
+    }
 
-        invitation.status = InvitationStatus.ACCEPTED
-
-        invitation.save()
-
+    private void handleAccepted(invitation) {
         if (invitation.guests.size() == 1) {
-            render view: 'plusone', model: [invitation: invitation]
+            offerPlusOne(invitation)
         } else {
-            redirect action: 'dietary', params: [id: invitation.id]
+            handleDietaryRequirements(invitation)
         }
     }
 
-    def dietary(String id) {
-        def invitation = Invitation.get(id)
+    private offerPlusOne(invitation) {
+        render view: 'plusone', model: [invitation: invitation]
+    }
 
+    private void handleDietaryRequirements(invitation) {
         def firstGuestWithoutDietaryChoice = invitation.guests.find({ it.dietaryChoice == null })
 
         if (firstGuestWithoutDietaryChoice) {
             render view: 'dietaryChoice', model: [invitation: invitation, guest: firstGuestWithoutDietaryChoice]
         } else {
-            redirect action: 'summary', params: [id: invitation.id]
+            render view: 'summary', model: [invitation: invitation]
         }
+    }
+
+    def decline(String id) {
+        def invitation = Invitation.get(id)
+
+        invitation.status = DECLINED
+
+        invitation.save()
+
+        redirect action: 'rsvp', id: id
+    }
+
+    def accept(String id) {
+        def invitation = Invitation.get(id)
+
+        invitation.status = ACCEPTED
+
+        invitation.save()
+
+        redirect action: 'rsvp', id: id
     }
 
     def chooseDietary(String id, ChooseDietaryRequirementCommand command) {
@@ -63,6 +83,6 @@ class RsvpController {
 
         guest.save()
 
-        redirect action: 'dietary', params: [id: id]
+        redirect action: 'rsvp', id: id
     }
 }

@@ -29,14 +29,7 @@ class RsvpUrlsTest extends Specification {
         }
     }
 
-    void 'asks guests about dietary requirements'() {
-        expect:
-        assertForwardUrlMapping('/rsvp/mycode/dietary', controller: 'rsvp', action: 'dietary') {
-            id == 'mycode'
-        }
-    }
-
-    void 'allows a guest to choice a dietary requirement'() {
+    void 'allows a guest to choose a dietary requirement'() {
         expect:
         assertForwardUrlMapping('/rsvp/mycode/chooseDietary', controller: 'rsvp', action: 'chooseDietary') {
             id == 'mycode'
