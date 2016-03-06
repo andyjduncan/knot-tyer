@@ -11,8 +11,17 @@ class BootStrap {
                         .save(flush: true)
 
                 new Invitation()
+                        .addToGuests(new Guest(firstName: 'Charlie', lastName: 'Nomates'))
+                        .save(flush: true)
+
+                new Invitation()
                         .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest'))
                         .addToGuests(new Guest(firstName: 'Bob', lastName: 'Guest'))
+                        .save(flush: true)
+
+                new Invitation()
+                        .addToGuests(new Guest(firstName: 'Fred', lastName: 'Rocky'))
+                        .addToGuests(new Guest(firstName: 'Gladys', lastName: 'Rocky'))
                         .save(flush: true)
             }
         }

@@ -21,7 +21,7 @@ class RsvpController {
             case ACCEPTED:
                 handleAccepted(invitation)
                 break
-            case DONE_PLUS_ONE:
+            case ATTENDEES_RESOLVED:
                 handleDietaryRequirements(invitation)
                 break
 
@@ -41,7 +41,7 @@ class RsvpController {
         if (invitation.guests.size() == 1) {
             offerPlusOne(invitation)
         } else {
-            handleDietaryRequirements(invitation)
+            render view: 'chooseGuests', model: [invitation: invitation]
         }
     }
 
@@ -50,7 +50,7 @@ class RsvpController {
     }
 
     private void handleDietaryRequirements(invitation) {
-        def firstGuestWithoutDietaryChoice = invitation.guests.find({ it.dietaryChoice == null })
+        def firstGuestWithoutDietaryChoice = invitation.guests.find({ it.attending && it.dietaryChoice == null })
 
         if (firstGuestWithoutDietaryChoice) {
             render view: 'dietaryChoice', model: [invitation: invitation, guest: firstGuestWithoutDietaryChoice]
@@ -82,7 +82,8 @@ class RsvpController {
     def noPlusOne(String id) {
         def invitation = Invitation.get(id)
 
-        invitation.status = DONE_PLUS_ONE
+        invitation.guests.first().attending = true
+        invitation.status = ATTENDEES_RESOLVED
 
         invitation.save()
 
@@ -99,17 +100,28 @@ class RsvpController {
         def invitation = Invitation.get(id)
 
         invitation.addToGuests(new Guest(firstName: firstName, lastName: lastName))
-        invitation.status = DONE_PLUS_ONE
 
-        if (!invitation.save()) {
-            println invitation.errors
-        }
+        invitation.status = ATTENDEES_RESOLVED
+
+        invitation.guests.each { it.attending = true }
 
         redirect action: 'rsvp', id: id
     }
 
     def chooseGuests(String id, String guestIds) {
+        def ids = guestIds.split(',')
 
+        def invitation = Invitation.get(id)
+
+        invitation.guests.each {
+            it.attending = ids.contains(it.id)
+        }
+
+        invitation.status = ATTENDEES_RESOLVED
+
+        invitation.save()
+
+        redirect action: 'rsvp', id: id
     }
 
     def chooseDietary(String id, ChooseDietaryRequirementCommand command) {

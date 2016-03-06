@@ -3,7 +3,6 @@ package knot.tyer
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import knot.type.ChooseDietaryRequirementCommand
-import org.grails.datastore.mapping.query.Query
 import spock.lang.Specification
 
 import static knot.tyer.InvitationStatus.*
@@ -92,8 +91,11 @@ class RsvpControllerSpec extends Specification {
         when:
         controller.noPlusOne(invitation.id)
 
+
         then:
-        Invitation.get(invitation.id).status == DONE_PLUS_ONE
+        def saved = Invitation.get(invitation.id)
+        saved.status == ATTENDEES_RESOLVED
+        saved.guests[0].attending == true
         response.redirectedUrl == "/rsvp/$invitation.id"
     }
 
@@ -122,13 +124,19 @@ class RsvpControllerSpec extends Specification {
 
         then:
         def saved = Invitation.get(invitation.id)
-        saved.guests[1].firstName == 'Bob'
-        saved.guests[1].lastName == 'Name'
-        saved.status == DONE_PLUS_ONE
+        def plusOne = saved.guests[1]
+        plusOne.firstName == 'Bob'
+        plusOne.lastName == 'Name'
+
+        and:
+        saved.guests.every { it.attending }
+        saved.status == ATTENDEES_RESOLVED
+
+        and:
         response.redirectedUrl == "/rsvp/$invitation.id"
     }
 
-    void 'asks couples who are coming about their dietary requirements'() {
+    void 'asks couples who is attending'() {
         given:
         def invitation = new Invitation(status: ACCEPTED)
                 .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest'))
@@ -139,16 +147,78 @@ class RsvpControllerSpec extends Specification {
         controller.rsvp(invitation.id)
 
         then:
-        view == '/rsvp/dietaryChoice'
+        view == '/rsvp/chooseGuests'
         model.invitation.id == invitation.id
-        model.guest.firstName == 'Alice'
+    }
+
+    void 'marks both members of a couple as attending'() {
+        given:
+        def guest1 = new Guest(firstName: 'Alice', lastName: 'Guest')
+        def guest2 = new Guest(firstName: 'Bob', lastName: 'Guest')
+        def invitation = new Invitation(status: ACCEPTED)
+                .addToGuests(guest1)
+                .addToGuests(guest2)
+                .save()
+
+        when:
+        controller.chooseGuests(invitation.id, "$guest1.id,$guest2.id")
+
+        then:
+        def saved = Invitation.get(invitation.id)
+        saved.status == ATTENDEES_RESOLVED
+
+        and:
+        saved.guests.every { it.attending }
+
+        and:
+        response.redirectedUrl == "/rsvp/$invitation.id"
+    }
+
+    void 'marks only a single member of a couple as attending'() {
+        given:
+        def guest1 = new Guest(firstName: 'Alice', lastName: 'Guest')
+        def guest2 = new Guest(firstName: 'Bob', lastName: 'Guest')
+        def invitation = new Invitation(status: ACCEPTED)
+                .addToGuests(guest1)
+                .addToGuests(guest2)
+                .save()
+
+        when:
+        controller.chooseGuests(invitation.id, "$guest1.id")
+
+        then:
+        def saved = Invitation.get(invitation.id)
+        saved.status == ATTENDEES_RESOLVED
+
+        and:
+        saved.guests[0].attending == true
+        saved.guests[1].attending == false
+
+        and:
+        response.redirectedUrl == "/rsvp/$invitation.id"
     }
 
     void 'asks for the dietary requirements of the first guest without a choice'() {
         given:
-        def invitation = new Invitation(status: ACCEPTED)
-                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest', dietaryChoice: DietaryRequirement.NONE))
-                .addToGuests(new Guest(firstName: 'Bob', lastName: 'Guest'))
+        def invitation = new Invitation(status: ATTENDEES_RESOLVED)
+                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest', attending: true, dietaryChoice: DietaryRequirement.NONE))
+                .addToGuests(new Guest(firstName: 'Bob', lastName: 'Guest', attending: true))
+                .save()
+
+        when:
+        controller.rsvp(invitation.id)
+
+        then:
+        view == '/rsvp/dietaryChoice'
+        model.invitation.id == invitation.id
+        model.guest.firstName == 'Bob'
+    }
+
+    void 'asks for the dietary requirements of the first attending guest without a choice'() {
+        given:
+        def invitation = new Invitation(status: ATTENDEES_RESOLVED)
+                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest', attending: false))
+                .addToGuests(new Guest(firstName: 'Bob', lastName: 'Guest', attending: true))
                 .save()
 
         when:
@@ -180,7 +250,7 @@ class RsvpControllerSpec extends Specification {
 
     void 'shows the rsvp summary when there are no guests without a dietary choice'() {
         given:
-        def invitation = new Invitation(status: ACCEPTED)
+        def invitation = new Invitation(status: ATTENDEES_RESOLVED)
                 .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest', dietaryChoice: DietaryRequirement.NONE))
                 .addToGuests(new Guest(firstName: 'Bob', lastName: 'Guest', dietaryChoice: DietaryRequirement.VEGETARIAN))
                 .save()

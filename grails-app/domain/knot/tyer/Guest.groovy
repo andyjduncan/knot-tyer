@@ -4,6 +4,7 @@ class Guest {
 
     static constraints = {
         dietaryChoice nullable: true
+        attending nullable: true
     }
 
     static mapping = {
@@ -17,6 +18,8 @@ class Guest {
     String firstName
 
     String lastName
+
+    Boolean attending
 
     DietaryRequirement dietaryChoice
 

@@ -5,5 +5,5 @@ enum InvitationStatus {
     PENDING,
     ACCEPTED,
     DECLINED,
-    DONE_PLUS_ONE
+    ATTENDEES_RESOLVED
 }
