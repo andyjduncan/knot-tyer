@@ -14,5 +14,16 @@
 
 <body>
 Sorry to hear that :(
+
+<g:form action="accept" id="${invitation.id}">
+    <button class="btn btn-lg btn-success">
+        <g:if test="${invitation.guests.size() == 1}">
+            I've changed my mind!
+        </g:if>
+        <g:else>
+            We've changed our minds!
+        </g:else>
+    </button>
+</g:form>
 </body>
 </html>
