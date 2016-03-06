@@ -21,6 +21,9 @@ class RsvpController {
             case ACCEPTED:
                 handleAccepted(invitation)
                 break
+            case DONE_PLUS_ONE:
+                handleDietaryRequirements(invitation)
+                break
 
         }
 
@@ -43,7 +46,7 @@ class RsvpController {
     }
 
     private offerPlusOne(invitation) {
-        render view: 'plusone', model: [invitation: invitation]
+        render view: 'plusOne', model: [invitation: invitation]
     }
 
     private void handleDietaryRequirements(invitation) {
@@ -74,6 +77,39 @@ class RsvpController {
         invitation.save()
 
         redirect action: 'rsvp', id: id
+    }
+
+    def noPlusOne(String id) {
+        def invitation = Invitation.get(id)
+
+        invitation.status = DONE_PLUS_ONE
+
+        invitation.save()
+
+        redirect action: 'rsvp', id: id
+    }
+
+    def plusOne(String id) {
+        def invitation = Invitation.get(id)
+
+        render view: 'plusOneDetails', model: [invitation: invitation]
+    }
+
+    def addPlusOne(String id, String firstName, String lastName) {
+        def invitation = Invitation.get(id)
+
+        invitation.addToGuests(new Guest(firstName: firstName, lastName: lastName))
+        invitation.status = DONE_PLUS_ONE
+
+        if (!invitation.save()) {
+            println invitation.errors
+        }
+
+        redirect action: 'rsvp', id: id
+    }
+
+    def chooseGuests(String id, String guestIds) {
+
     }
 
     def chooseDietary(String id, ChooseDietaryRequirementCommand command) {

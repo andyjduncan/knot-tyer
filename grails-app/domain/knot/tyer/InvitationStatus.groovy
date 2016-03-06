@@ -4,5 +4,6 @@ enum InvitationStatus {
 
     PENDING,
     ACCEPTED,
-    DECLINED
+    DECLINED,
+    DONE_PLUS_ONE
 }

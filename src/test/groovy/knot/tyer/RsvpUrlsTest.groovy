@@ -29,6 +29,37 @@ class RsvpUrlsTest extends Specification {
         }
     }
 
+    void 'a guest can decline a plus one'() {
+        expect:
+        assertForwardUrlMapping('/rsvp/mycode/noPlusOne', controller: 'rsvp', action: 'noPlusOne') {
+            id = 'mycode'
+        }
+    }
+
+    void 'a guest can add a plus one'() {
+        expect:
+        assertForwardUrlMapping('/rsvp/mycode/plusOne', controller: 'rsvp', action: 'plusOne') {
+            id = 'mycode'
+        }
+    }
+
+    void 'a guest can provide information about a plus one'() {
+        expect:
+        assertForwardUrlMapping('/rsvp/mycode/addPlusOne?firstName=Guy&lastName=Incognito',
+                controller: 'rsvp', action: 'addPlusOne',
+                params: [firstName: 'Guy', lastName: 'Incognito']) {
+            id = 'mycode'
+        }
+    }
+
+    void 'a couple can specific attendees'() {
+        expect:
+        assertForwardUrlMapping('/rsvp/mycode/chooseGuests?guestIds=1,2',
+                controller: 'rsvp', action: 'chooseGuests', params: [guestIds: '1,2']) {
+            id = 'mycode'
+        }
+    }
+
     void 'allows a guest to choose a dietary requirement'() {
         expect:
         assertForwardUrlMapping('/rsvp/mycode/chooseDietary', controller: 'rsvp', action: 'chooseDietary') {

@@ -13,6 +13,6 @@
 </head>
 
 <body>
-
+${invitation.status}
 </body>
 </html>

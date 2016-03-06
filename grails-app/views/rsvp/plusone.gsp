@@ -13,6 +13,14 @@
 </head>
 
 <body>
+Are you bringing anyone else?
+
+<g:form controller="rsvp" action="noPlusOne" id="${invitation.id}">
+    <button class="btn btn-lg btn-success">Nope, just me</button>
+</g:form>
+<g:form controller="rsvp" action="plusOne" id="${invitation.id}">
+    <button class="btn btn-lg btn-success">Yep</button>
+</g:form>
 
 </body>
 </html>

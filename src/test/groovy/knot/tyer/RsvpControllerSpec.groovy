@@ -3,10 +3,10 @@ package knot.tyer
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import knot.type.ChooseDietaryRequirementCommand
+import org.grails.datastore.mapping.query.Query
 import spock.lang.Specification
 
-import static knot.tyer.InvitationStatus.ACCEPTED
-import static knot.tyer.InvitationStatus.DECLINED
+import static knot.tyer.InvitationStatus.*
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
@@ -79,8 +79,53 @@ class RsvpControllerSpec extends Specification {
         controller.rsvp(invitation.id)
 
         then:
-        view == '/rsvp/plusone'
+        view == '/rsvp/plusOne'
         model.invitation.id == invitation.id
+    }
+
+    void 'allows single guests to decline a plus one'() {
+        given:
+        def invitation = new Invitation(status: ACCEPTED)
+                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest'))
+                .save()
+
+        when:
+        controller.noPlusOne(invitation.id)
+
+        then:
+        Invitation.get(invitation.id).status == DONE_PLUS_ONE
+        response.redirectedUrl == "/rsvp/$invitation.id"
+    }
+
+    void 'allows single guests to add a plus one'() {
+        given:
+        def invitation = new Invitation(status: ACCEPTED)
+                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest'))
+                .save()
+
+        when:
+        controller.plusOne(invitation.id)
+
+        then:
+        view == '/rsvp/plusOneDetails'
+        model.invitation.id == invitation.id
+    }
+
+    void 'saves the plus one details'() {
+        given:
+        def invitation = new Invitation(status: ACCEPTED)
+                .addToGuests(new Guest(firstName: 'Alice', lastName: 'Guest'))
+                .save()
+
+        when:
+        controller.addPlusOne(invitation.id, 'Bob', 'Name')
+
+        then:
+        def saved = Invitation.get(invitation.id)
+        saved.guests[1].firstName == 'Bob'
+        saved.guests[1].lastName == 'Name'
+        saved.status == DONE_PLUS_ONE
+        response.redirectedUrl == "/rsvp/$invitation.id"
     }
 
     void 'asks couples who are coming about their dietary requirements'() {
