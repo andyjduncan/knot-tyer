@@ -2,7 +2,6 @@ package knot.tyer
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import knot.type.ChooseDietaryRequirementCommand
 import spock.lang.Specification
 
 import static knot.tyer.InvitationStatus.*

@@ -1,7 +1,6 @@
-package knot.type
+package knot.tyer
 
 import grails.validation.Validateable
-import knot.tyer.DietaryRequirement
 
 class ChooseDietaryRequirementCommand implements Validateable {
 

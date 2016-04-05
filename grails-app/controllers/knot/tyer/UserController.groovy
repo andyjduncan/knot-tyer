@@ -3,8 +3,8 @@ package knot.tyer
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('ROLE_ADMIN')
-class InvitationController {
+class UserController {
 
-    static scaffold = Invitation
+    static scaffold = User
 
 }

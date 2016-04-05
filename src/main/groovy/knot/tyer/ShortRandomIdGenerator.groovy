@@ -1,4 +1,4 @@
-package knot.type
+package knot.tyer
 
 import org.apache.commons.lang.RandomStringUtils
 import org.hibernate.HibernateException

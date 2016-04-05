@@ -1,7 +1,5 @@
 package knot.tyer
 
-import knot.type.ChooseDietaryRequirementCommand
-
 import static knot.tyer.InvitationStatus.*
 
 class RsvpController {

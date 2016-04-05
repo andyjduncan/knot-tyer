@@ -8,7 +8,7 @@ class Guest {
     }
 
     static mapping = {
-        id generator: 'knot.type.ShortRandomIdGenerator'
+        id generator: 'knot.tyer.ShortRandomIdGenerator'
     }
 
     static belongsTo = [invitation: Invitation]
@@ -27,3 +27,4 @@ class Guest {
         "$firstName $lastName"
     }
 }
+
