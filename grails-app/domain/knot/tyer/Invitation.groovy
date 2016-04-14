@@ -3,6 +3,7 @@ package knot.tyer
 class Invitation {
 
     static constraints = {
+        address nullable: true
     }
 
     static hasMany = [guests: Guest]
@@ -17,7 +18,7 @@ class Invitation {
 
     InvitationStatus status = InvitationStatus.PENDING
 
-    List<Guest> guests
+    List<Guest> guests = []
 
     Address address
 }
