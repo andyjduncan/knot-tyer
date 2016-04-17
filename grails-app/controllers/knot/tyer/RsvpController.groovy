@@ -103,6 +103,8 @@ class RsvpController {
 
         invitation.guests.each { it.attending = true }
 
+        invitation.save()
+
         redirect action: 'rsvp', id: id
     }
 
