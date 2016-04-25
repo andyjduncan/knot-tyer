@@ -1,5 +1,8 @@
 package knot.tyer
 
+import grails.plugin.springsecurity.annotation.Secured
+
+@Secured('ROLE_ADMIN')
 class InviteController {
 
     def index() { }
@@ -29,12 +32,24 @@ class InviteController {
         render view: '/invite/address', model: [invitation: invitation]
     }
 
+    def showAddAddress(String id) {
+        def invitation = Invitation.get(id)
+
+        render view: '/invite/address', model: [invitation: invitation]
+    }
+
     def addAddress(String id) {
         def invitation = Invitation.get(id)
 
         invitation.address = new Address(params)
 
         invitation.save()
+
+        render view: '/invite/email', model: [invitation: invitation]
+    }
+
+    def showAddEmail(String id) {
+        def invitation = Invitation.get(id)
 
         render view: '/invite/email', model: [invitation: invitation]
     }
@@ -46,6 +61,7 @@ class InviteController {
 
         invitation.save()
 
-        render view: '/invite/list', model: [invitations: Invitation.list()]
+        redirect controller: 'invitation', action: 'index'
+//        render view: '/invite/list', model: [invitations: Invitation.list()]
     }
 }

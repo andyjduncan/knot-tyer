@@ -15,12 +15,10 @@
 <body>
 Are you bringing anyone else?
 
-<g:form controller="rsvp" action="noPlusOne" id="${invitation.id}">
-    <button class="btn btn-lg btn-success">Nope, just me</button>
+<g:form controller="rsvp" action="addPlusOne" id="${invitation.id}">
+    <input class="required-indicator" type="text" name="firstName" placeholder="firstName" required />
+    <input class="required-indicator" type="text" name="lastName" placeholder="lastName" required />
+    <button class="btn btn-lg">Yep</button>
 </g:form>
-<g:form controller="rsvp" action="plusOne" id="${invitation.id}">
-    <button class="btn btn-lg btn-success">Yep</button>
-</g:form>
-
 </body>
 </html>

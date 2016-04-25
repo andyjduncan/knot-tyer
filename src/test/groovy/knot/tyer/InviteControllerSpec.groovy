@@ -59,6 +59,19 @@ class InviteControllerSpec extends Specification {
         model.invitation.id == invitation.id
     }
 
+    void 'shows the add address form'() {
+        given:
+        def invitation = new Invitation()
+                .save(failOnError: true)
+
+        when:
+        controller.showAddAddress(invitation.id)
+
+        then:
+        view == '/invite/address'
+        model.invitation.id == invitation.id
+    }
+
     void 'adds an address'() {
         given:
         def invitation = new Invitation()
@@ -77,6 +90,19 @@ class InviteControllerSpec extends Specification {
         saved.address.postalCode == 'postal'
 
         and:
+        view == '/invite/email'
+        model.invitation.id == invitation.id
+    }
+
+    void 'shows the add email address form'() {
+        given:
+        def invitation = new Invitation()
+                .save(failOnError: true)
+
+        when:
+        controller.showAddEmail(invitation.id)
+
+        then:
         view == '/invite/email'
         model.invitation.id == invitation.id
     }
