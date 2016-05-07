@@ -5,7 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured('ROLE_ADMIN')
 class InviteController {
 
-    def index() { }
+    def index() {}
 
     def start() {
         render view: 'start'
@@ -15,11 +15,7 @@ class InviteController {
         def invitation = new Invitation()
         invitation.addToGuests(new Guest(firstName: firstName, lastName: lastName))
 
-        if (invitation.save(failOnError:true)) {
-            render view: '/invite/plusone', model: [invitation: invitation]
-        } else {
-            println invitation.errors.allErrors
-        }
+        render view: '/invite/plusone', model: [invitation: invitation]
     }
 
     def addPlusOne(String id, String firstName, String lastName) {
@@ -61,7 +57,11 @@ class InviteController {
 
         invitation.save()
 
-        redirect controller: 'invitation', action: 'index'
-//        render view: '/invite/list', model: [invitations: Invitation.list()]
+//        redirect controller: 'invitation', action: 'index'
+        redirect view: 'list'
+    }
+
+    def list() {
+        render view: '/invite/list', model: [invitations: Invitation.list()]
     }
 }

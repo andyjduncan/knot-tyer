@@ -27,11 +27,12 @@ class BootStrap {
                         .addToGuests(new Guest(firstName: 'Fred', lastName: 'Rocky'))
                         .addToGuests(new Guest(firstName: 'Gladys', lastName: 'Rocky'))
                         .save(flush: true)
-
-                def user = new User('admin', 'password').save()
-                def role = new Role('ROLE_ADMIN').save()
-                UserRole.create user, role, true
             }
+        }
+        if (!User.countByUsername('admin')) {
+            def user = new User('admin', 'password').save()
+            def role = new Role('ROLE_ADMIN').save()
+            UserRole.create user, role, true
         }
     }
     def destroy = {
